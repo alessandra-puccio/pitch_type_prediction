@@ -12,18 +12,24 @@ player_names = data['PLAYER_NAME'].unique().tolist()
 predictions = pd.read_csv('predictions.csv')
 
 # Function to load player stats for a given year and pitch type
-# Load player stats from JSON files
 def load_player_stats(year, pitch_type):
+    folder_path = 'player_stat_files'  # The folder where all your player stat files are stored
     filename = f'PLAYER_STATS_{pitch_type}_{year}.json'
-    with open(filename, 'r') as f:
+    file_path = os.path.join(folder_path, filename)
+    
+    with open(file_path, 'r') as f:
         data = [json.loads(line) for line in f.readlines()]
+        
     return pd.DataFrame(data)
+
 
 # Streamlit app
 st.title('Player Pitch Type Predictions')
 
-# Player selection dropdown
-selected_player = st.selectbox('Select a Player', player_names)
+default_index = player_names.index("Benintendi, Andrew")
+# Player selection dropdown with default set to "Benintendi, Andrew"
+selected_player = st.selectbox('Select a Player', player_names, index=default_index)
+
 
 # Get the BATTER_ID for the selected player
 batter_id = data[data['PLAYER_NAME'] == selected_player]['BATTER_ID'].values[0]
@@ -33,12 +39,12 @@ years = [2021, 2022, 2023]
 pitches = ['OS', 'FB', 'BB']
 
 # Iterate through each pitch type to gather data
-# Iterate through each pitch type to gather data
 for pitch in pitches:  # Make sure you're using pitch_types as previously defined
     received_percentages = []
     avg_isos = []
     avg_babips = []
     avg_wobas = []
+    valid_years = []  # Track years with valid data
 
     for year in years:
         stats = load_player_stats(year, pitch)
@@ -52,44 +58,28 @@ for pitch in pitches:  # Make sure you're using pitch_types as previously define
                 avg_isos.append(player_stats['AVG_ISO'].values[0])
                 avg_babips.append(player_stats['AVG_BABIP'].values[0])
                 avg_wobas.append(player_stats['AVG_WOBA_HIT_INTO_PLAY'].values[0])
-            else:
-                # If the player is not found, append zeros
-                received_percentages.append(0)
-                avg_isos.append(0)
-                avg_babips.append(0)
-                avg_wobas.append(0)
-        else:
-            # If the JSON file does not contain any data, append zeros
-            received_percentages.append(0)
-            avg_isos.append(0)
-            avg_babips.append(0)
-            avg_wobas.append(0)
-
-    # Now you have collected data for this pitch type, and you can continue with your plotting code
-
-
+                valid_years.append(str(year))  # Append year only when data exists
+           
     # Retrieve the predicted percentage for 2024
     prediction_row = predictions[predictions['BATTER_ID'] == batter_id]
     if not prediction_row.empty:
         predicted_percentage = prediction_row[f'PITCH_TYPE_{pitch}'].values[0]
-    else:
-        predicted_percentage = 0  # No prediction available
-
-    # Prepare data for plotting
-    years_labels = [str(year) for year in years] + ['2024']
-    received_percentages.append(predicted_percentage)
+        received_percentages.append(predicted_percentage)
+        valid_years.append('2024')  # Add 2024 for the predicted percentage
     
+    # Prepare data for plotting
     # Create the plot
     fig, ax1 = plt.subplots(figsize=(10, 6))
     ax2 = ax1.twinx()  # Create a second y-axis for lines
-
+    
     # Bar plot for received percentages
-    ax1.bar(years_labels, received_percentages, color=['blue'] * 3 + ['orange'], label='Received Percentage')
+    ax1.bar(valid_years[:-1], received_percentages[:-1], color='blue', label='Received Percentage')
+    ax1.bar(valid_years[-1], received_percentages[-1], color='orange', label='Predicted Percentage')
 
-    # Line plots for AVG_ISO, AVG_BABIP, and AVG_WOBA
-    ax2.plot(years_labels[:-1], avg_isos, color='green', marker='o', label='AVG ISO')
-    ax2.plot(years_labels[:-1], avg_babips, color='red', marker='o', label='AVG BABIP')
-    ax2.plot(years_labels[:-1], avg_wobas, color='purple', marker='o', label='AVG WOBA')
+    # Line plots for AVG_ISO, AVG_BABIP, and AVG_WOBA (only for valid years)
+    ax2.plot(valid_years[:-1], avg_isos, color='green', marker='o', label='AVG ISO')
+    ax2.plot(valid_years[:-1], avg_babips, color='red', marker='o', label='AVG BABIP')
+    ax2.plot(valid_years[:-1], avg_wobas, color='purple', marker='o', label='AVG WOBA')
 
     # Adding labels and legends
     ax1.set_xlabel('Year')
