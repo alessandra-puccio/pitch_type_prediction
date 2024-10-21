@@ -13,7 +13,7 @@ predictions = pd.read_csv('predictions.csv')
 
 # Function to load player stats for a given year and pitch type
 def load_player_stats(year, pitch_type):
-    folder_path = 'player_stat_files'  # The folder where all your player stat files are stored
+    folder_path = 'player_stat_files'  
     filename = f'PLAYER_STATS_{pitch_type}_{year}.json'
     file_path = os.path.join(folder_path, filename)
     
@@ -26,7 +26,6 @@ def load_player_stats(year, pitch_type):
 st.title('Pitch Type Predictions and Analysis')
 
 default_index = player_names.index("Benintendi, Andrew")
-# Player selection dropdown with default set to "Benintendi, Andrew"
 selected_player = st.selectbox('Select a Player', player_names, index=default_index)
 
 # Get the BATTER_ID for the selected player
