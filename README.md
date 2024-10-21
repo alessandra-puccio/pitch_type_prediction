@@ -16,7 +16,7 @@ For an explanation of how I processed the data, chose features, and created a mo
 ---
 
 ## Interpreting the Results
-Coming soon to a Streamlit that will be linked here! In the works.
+Explore [this Streamlit](https://pitchtypeprediction.streamlit.app/) website to view the results and trends by player.
 
 ---
 
