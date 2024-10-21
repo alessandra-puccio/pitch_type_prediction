@@ -158,7 +158,7 @@ lowest_babip_pitch = valid_pitch_types[babip_values.index(min_babip)]
 # Area for Growth analysis output
 
 st.markdown(f"""
-- **Lowest WOBA**: {min_woba} against {'Fastball' if lowest_woba_pitch == 'FB' else 'Breaking Ball' if lowest_woba_pitch == 'BB' else 'Offspeed'} pitch type.
+- **Lowest wOBA**: {min_woba} against {'Fastball' if lowest_woba_pitch == 'FB' else 'Breaking Ball' if lowest_woba_pitch == 'BB' else 'Offspeed'} pitch type.
 - **Lowest BABIP**: {min_babip} against {'Fastball' if lowest_babip_pitch == 'FB' else 'Breaking Ball' if lowest_babip_pitch == 'BB' else 'Offspeed'} pitch type.
 """)
 # Create a bar graph for WOBA and BABIP
