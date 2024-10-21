@@ -5,7 +5,7 @@ import os
 import matplotlib.pyplot as plt
 
 # Load player names from data.csv
-data = pd.read_csv('data.csv')
+data = pd.read_csv('datanames.csv')
 player_names = data['PLAYER_NAME'].unique().tolist()
 
 # Load predictions
